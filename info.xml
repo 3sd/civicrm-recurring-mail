@@ -2,7 +2,7 @@
 <extension key="civicrm-recurring-mail" type="module">
   <file>civicrm_recurring_mail</file>
   <name>Recurring mail</name>
-  <description>FIXME</description>
+  <description>Lets you configure CiviCRM mailings to be sent on a recurring schedule.</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Michael McAndrew</author>

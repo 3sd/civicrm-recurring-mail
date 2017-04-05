@@ -1,5 +1,5 @@
-# CiviCRM Recurring mail
+# CiviCRM Recurring mailings
 
-This extension allows you to configure CiviMails to be sent out on a regular basis.
+Lets you configure CiviCRM mailings to be sent on a recurring schedule.
 
-It uses CiviCRM's 
+Funding generously provided by [eLife Sciences](https://elifesciences.org/), a unique, non-profit collaboration between the funders and practitioners of research to improve the way important results are presented and shared.
