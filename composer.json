@@ -1,0 +1,13 @@
+{
+    "name": "3sd/civicrm-recurring-mail",
+    "description": "Schedule CiviMails to go out on a regular basis",
+    "authors": [
+        {
+            "name": "Michael McAndrew",
+            "email": "michaelmcandrew@thirdsectordesign.org"
+        }
+    ],
+    "require": {
+        "simshaun/recurr": "^2.2"
+    }
+}

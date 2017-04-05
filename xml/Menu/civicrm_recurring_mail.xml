@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/mailing/recur/scratch</path>
+    <page_callback>CRM_RecurringMail_Page_Scratch</page_callback>
+    <title>Recurring mail - Scratch</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>
