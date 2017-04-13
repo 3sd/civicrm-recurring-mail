@@ -1,0 +1,7 @@
+.crmMailingRecur select{
+  width: auto;
+}
+
+.crmMailingRecur input[type=text].count {
+  width: 3em;
+}

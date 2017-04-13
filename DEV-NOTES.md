@@ -5,22 +5,22 @@
   * CRM_RecurringMail_DAO_RecurRule <--> civicrm_mailing_recur_rule
 * Creates a maximum of 50 recurrences for each recurring email
 * Logic to create a recurring email CRM_RecurringMail_BAO_MailingRecur::create()
+* Append a new option to BlockSchedule that adds a recurring schedule form when selected
+* UI to create a valid recur rule
 
 # TODO
-
-* Prevent submitting a mailing if it is recurring mailing
-* Prevent cancelling and editing recurrences.
+* Prevent submitting a mailing if it is recurring mailing (UI)
+* Prevent submitting a mailing if it is recurring mailing (code)
+* Prevent cancelling and editing recurrences (UI)
+* Prevent cancelling and editing recurrences (code)
 * Allow editing the recurrence schedule
-* Ensure that when a recurring email is deleted, all the recurrences are also deleted.
-* Do not generate any emails that are scheduled for less than one hour from now since that will give people time to realise if they have made a mistake.
-* Create a cron job that cycles through each recurring email
-* Append a new option to BlockSchedule
-* See if you can append *anything* to BlockSchedule
-* Allow people to switch a mailing between recurring and one-off
-* Disallow people from submitting recurring mailings via code
-* Disallow people from submitting recurring mailings via the UI
+* Ensure that when a recurring email is deleted, all the recurrences are also deleted (code)
+* Do not generate any emails that are scheduled for less than one hour from now since that will give people time to realise if they have made a mistake. (code)
+* Create a cron job that cycles through each recurring emails, creates new ones if necessary, and deletes any that should not be there.
+* Allow people to switch a mailing between recurring and one-off (UI)
+* Allow people to switch a mailing between recurring and one-off (code)
 * Clone google repeat date UI with minor tweaks (see UI for recurrence below)
-* Allow people to preview the list of scheduled emails before they are created
+* Allow people to preview the list of scheduled emails before they are created (UI)
 
 ## Data model
 
@@ -42,6 +42,7 @@ Note: we should not delete existing recurrences if they are in range. We should 
 
 Cap scheduled emails at X days into the future? heck to see if any new ones should be created each time we run the job.
 
+Only delete mailings if they have not been sent.
 
 ## UI additions and alterations
 
@@ -53,13 +54,12 @@ Cron job that cycles all recurring mails and adds new ones if necessary (daily)
 
 ### UI for creating recurrence
 
-* Time of day: (time, 5 minute intervals)
-* Start date: (date)
 * Repeats:
 * Daily
 * Weekly
 * Monthly
 * Yearly
+* Starts: (date+time)
 * Repeat every (integer)
 
 if Repeats:Weekly:{

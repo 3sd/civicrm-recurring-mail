@@ -1,0 +1,67 @@
+<div class="crmMailingRecur">
+  <div class="crm-block crm-form-block">
+
+    <div class="crm-section">
+      <div class="label">Repeat on a </div>
+      <div class="content">
+        <select ng-model="freq" ng-options="freq as freq.label for (i, freq) in freqs"/> basis
+        <span ng-if="freq.value=='MONTHLY'"> by <select ng-model="$parent.monthRepeat" ng-options="monthRepeat as monthRepeat.label for (i, monthRepeat) in monthRepeats"/> </span>
+      </div>
+      <div class="clear"></div>
+    </div>
+
+    <div class="crm-section">
+      <div class="label">Send every</div>
+      <div class="content"><select ng-model="interval" ng-options="interval for interval in intervals"/> {{ freq.interval }}</div>
+      <div class="clear"></div>
+    </div>
+
+    <div class="crm-section">
+      <div class="label">starting on</div>
+      <div class="content"><input crm-ui-datepicker="{required: true}" ng-model="start" /></div>
+      <div class="clear"></div>
+    </div>
+
+    <div class="crm-section" ng-if="freq.value=='WEEKLY'">
+      <div class="label">every</div>
+      <div class="content">
+        <span ng-repeat="dayOfWeek in daysOfWeek">
+          <input type="checkbox" ng-model="dayOfWeek.selected" ng-change="setWeekly()">{{dayOfWeek.value}}
+        </span>
+      </div>
+      <div class="clear"></div>
+    </div>
+
+    <div class="crm-section" ng-if="freq.value=='MONTHLY'">
+      <div class="label">on the</div>
+      <div class="content" ng-if="monthRepeat.value=='dayofweek'">
+        <select ng-model="$parent.weekOfMonth" ng-options="weekOfMonth as weekOfMonth.label for (i, weekOfMonth) in weeksOfMonth"/>
+        <select ng-model="$parent.dayOfWeek" ng-options="dayOfWeek as dayOfWeek.label for dayofweek in daysOfWeek"/> of the month
+      </div>
+      <div class="content" ng-if="monthRepeat.value=='dayofmonth'">
+        <select ng-model="$parent.dayOfMonth" ng-options="dayOfMonth as dayOfMonth.label for dayOfMonth in daysOfMonth"/> day of the month
+      </div>
+      <div class="clear"></div>
+    </div>
+
+    <div class="crm-section">
+      <div class="label">ending</div>
+      <div class="content">
+        <div>
+          <input type="radio" ng-model="end" value=""> never
+        </div>
+        <div>
+          <input type="radio" ng-model="end" value="until"> on the <input crm-ui-datepicker="{time: false}" ng-model="until" ng-focus="setEnd('until')" />
+        </div>
+        <div>
+          <input type="radio" ng-model="end" value="count"> after <input type="number" class="count" ng-model="count" ng-focus="setEnd('count')"> occurences
+        </div>
+      </div>
+      <div class="clear"></div>
+
+
+      <pre>DTSTART={{ start | date:'yyyyMMddTHHmmss' }};FREQ={{ freq.value }};INTERVAL={{ interval }};{{ weekly }}{{ monthly }}{{ ends }}</pre>
+
+    </div>
+  </div>
+</div>
