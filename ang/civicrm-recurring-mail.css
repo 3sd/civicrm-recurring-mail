@@ -2,6 +2,11 @@
   width: auto;
 }
 
-.crmMailingRecur input[type=text].count {
+.crmMailingRecur input[type=number] {
   width: 3em;
+}
+
+.crmMailingRecur .ng-invalid-at-least-one-day.ng-dirty .days-of-week{
+  border: 1px solid red;
+  color: red;
 }
