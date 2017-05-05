@@ -1,22 +1,25 @@
 <?php
 
-class CRM_RecurringMail_BAO_MailingRecur extends CRM_RecurringMail_DAO_MailingRecur {
+class CRM_Mailing_Recur_BAO_MailingRecur extends CRM_Mailing_Recur_DAO_MailingRecur {
 
-  const MAX_RECURRENCES = 50;
+  // The maxium amount of recurrences that should be created. 25 instances
+  // won't clutter the UI too much and are fairly fast to create. As long as we
+  // run the CRON job more frequently than the time period between the first and
+  // last recurrence, we won't miss any recurrences.
+  const MAX_RECURRENCES = 25;
 
   /**
    * Create a new RecurRule based on array-data
    *
    * @param array $params key-value pairs
-   * @return CRM_RecurringMail_DAO_RecurRule|NULL
+   * @return CRM_Mailing_Recur_DAO_RecurRule|NULL
    **/
   public static function create($params) {
-    $className = 'CRM_RecurringMail_DAO_RecurRule';
     $entityName = 'RecurRule';
     $hook = empty($params['id']) ? 'create' : 'edit';
 
     CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
-    $instance = new $className();
+    $instance = new self;
     $instance->copyValues($params);
     $instance->save();
     CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
@@ -24,13 +27,30 @@ class CRM_RecurringMail_BAO_MailingRecur extends CRM_RecurringMail_DAO_MailingRe
     return $instance;
   }
 
-  function syncRecurrences(){
+  function schedule($params){
+    if($this->get('mailing_id', $params['mailing_id'])){
+      $this->recur = $params['recur'];
+      $this->update();
+    }else{
+      $this->recur = $params['recur'];
+      $this->mailing_id = $params['mailing_id'];
+      $this->insert();
+    }
+    $this->syncRecurrences();
+  }
 
+  function syncRecurrences(){
     // Get the master mailing.
     $masterMailing = civicrm_api3('mailing', 'getsingle', ['id' => $this->mailing_id]);
 
     // Get the list of dates that we would expect to exist, based on the rule.
     $expectedDates = $this->getExpectedDates();
+
+    //TODO If there are no expected dates, mark this recurring mail as completed
+    // (which means it will be ignored when running the cron to generate new
+    // recurrences
+    // if(!count($expectedDates)){
+    // }
 
     // To start, assume that none are in existence...
     $existingDates = [];
@@ -39,7 +59,7 @@ class CRM_RecurringMail_BAO_MailingRecur extends CRM_RecurringMail_DAO_MailingRe
     $datesToCreate = $expectedDates;
 
     // Cycle through the list of existing recurrences.
-    $existingRecurrences = new CRM_RecurringMail_BAO_Recurrence;
+    $existingRecurrences = new CRM_Mailing_Recur_BAO_Recurrence;
     $existingRecurrences->mailing_recur_id = $this->id;
     $existingRecurrences->find();
     while($existingRecurrences->fetch()){
@@ -49,6 +69,7 @@ class CRM_RecurringMail_BAO_MailingRecur extends CRM_RecurringMail_DAO_MailingRe
 
       // Check if the scheduled date of this mailing is in our range of expected
       // dates.
+
       $expectedKey = array_search(new DateTime($mailing['scheduled_date']), $expectedDates);
 
       if($expectedKey !== false){
@@ -80,7 +101,7 @@ class CRM_RecurringMail_BAO_MailingRecur extends CRM_RecurringMail_DAO_MailingRe
       // Base the parameters for the recurrence on the master mailing
       $mailingParams = $masterMailing;
       unset($mailingParams['id']);
-
+      $mailingParams['name'] = '[RECURRING] '.$mailingParams['name'];
       // Create and submit a new mailing with the appropriate date
       $createdMailing = civicrm_api3('mailing', 'create', $mailingParams);
       $submittedMailing = civicrm_api3('mailing', 'submit', [
@@ -89,7 +110,7 @@ class CRM_RecurringMail_BAO_MailingRecur extends CRM_RecurringMail_DAO_MailingRe
       ]);
 
       // Create a recurrence for this mailing
-      CRM_RecurringMail_BAO_Recurrence::create([
+      CRM_Mailing_Recur_BAO_Recurrence::create([
         'mailing_id' => $createdMailing['id'],
         'mailing_recur_id' => $this->id
       ]);
@@ -97,16 +118,35 @@ class CRM_RecurringMail_BAO_MailingRecur extends CRM_RecurringMail_DAO_MailingRe
   }
 
   function getExpectedDates(){
-    $rule = \Recurr\Rule::createFromString($this->rule);
+    $rule = \Recurr\Rule::createFromString($this->recur);
     $transformer = new \Recurr\Transformer\ArrayTransformer();
     $count = 0;
     foreach($transformer->transform($rule) as $date){
-      $recurrences[] = $date->getStart();
-      $count++;
+
+      // Only add the recurrence if the date is in the future
+      if($date->getStart() > new DateTime){
+        $recurrences[] = $date->getStart();
+        $count++;
+      }
+
+      // Finish once we have created enough recurrences
       if($count == self::MAX_RECURRENCES){
         break;
       }
     }
     return $recurrences;
+  }
+
+  function deleteRecurrenceMailings(){
+    $recurrences = new CRM_Mailing_Recur_BAO_Recurrence;
+    $recurrences->mailing_recur_id = $this->id;
+    $recurrences->find();
+    while($recurrences->fetch()){
+      civicrm_api3('Mailing', 'delete', ['id' => $recurrences->mailing_id]);
+    }
+  }
+
+  function isRecurringMailing($mailing_id){
+    return (boolean) $this->get('mailing_id', $mailing_id);
   }
 }

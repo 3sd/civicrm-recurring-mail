@@ -121,3 +121,50 @@ function civicrm_recurring_mail_civicrm_angularModules(&$angularModules) {
 function civicrm_recurring_mail_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   _civicrm_recurring_mail_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
+
+function civicrm_recurring_mail_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values){
+  if($objectName == 'Mailing' && in_array($op, array('view.mailing.browse.scheduled', 'view.mailing.browse.unscheduled'))){
+    $recurrence = new CRM_Mailing_Recur_BAO_Recurrence;
+    if($recurrence->get('mailing_id', $objectId)){
+      foreach($links as $key => $link){
+        if(in_array($link['name'], array('Cancel', 'Continue', 'Delete', 'Re-Use'))){
+          unset($links[$key]);
+        }
+      }
+      $links[] = [
+        'name' => 'Edit master',
+        'url' => 'civicrm/mailing/send',
+        'qs' => "mid={$recurrence->getMasterMailingId()}&continue=true&reset=1",
+        'title' => 'Edit master',
+        'bit' => 2
+      ];
+
+    }
+  }
+}
+
+function civicrm_recurring_mail_civicrm_pre($op, $objectName, $id, &$params){
+  // When deleting a mailing, check to see if it is a recurring mailing
+  if($objectName == 'Mailing' && $op == 'delete'){
+    if((new CRM_Mailing_Recur_BAO_MailingRecur)->isRecurringMailing($id)){
+      //If so, unschedule it before deleting (this will delete the recurrences)
+      civicrm_api3('MailingRecur', 'unschedule', ['mailing_id' => $id]);
+    }
+  }
+}
+
+function civicrm_recurring_mail_civicrm_entityTypes(&$entityTypes) {
+  $entityTypes[] = array(
+    'name'  => 'MailingRecur',
+    'class' => 'CRM_Mailing_Recur_DAO_MailingRecur',
+    'table' => 'civicrm_mailing_recur',
+  );
+  $entityTypes[] = array(
+    'name'  => 'MailingRecurrence',
+    'class' => 'CRM_Mailing_Recur_DAO_Recurrence',
+    'table' => 'civicrm_mailing_recurrence',
+  );
+}
+
+function civicrm_recurring_mail_civicrm_searchColumns( $objectName, &$headers, &$values, &$selector ) {
+}
