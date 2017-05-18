@@ -128,14 +128,14 @@ function _civicrm_recurring_mail_civix_civicrm_upgrade($op, CRM_Queue_Queue $que
 }
 
 /**
- * @return CRM_RecurringMail_Upgrader
+ * @return CRM_Mailing_Recur_Upgrader
  */
 function _civicrm_recurring_mail_civix_upgrader() {
-  if (!file_exists(__DIR__ . '/CRM/RecurringMail/Upgrader.php')) {
+  if (!file_exists(__DIR__ . '/CRM/Mailing/Recur/Upgrader.php')) {
     return NULL;
   }
   else {
-    return CRM_RecurringMail_Upgrader_Base::instance();
+    return CRM_Mailing_Recur_Upgrader_Base::instance();
   }
 }
 

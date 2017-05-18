@@ -21,6 +21,6 @@
     <ver>4.7</ver>
   </compatibility>
   <civix>
-    <namespace>CRM/RecurringMail</namespace>
+    <namespace>CRM/Mailing/Recur</namespace>
   </civix>
 </extension>

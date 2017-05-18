@@ -1,4 +1,4 @@
-Package: io.3sd.civicrmrecurringmail
+Package: civicrm-recurring-mail
 Copyright (C) 2017, Michael McAndrew <michaelmcandrew@thirdsectordesign.org>
 Licensed under the GNU Affero Public License 3.0 (below).
 
