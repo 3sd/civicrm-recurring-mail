@@ -16,7 +16,9 @@
 
       <div class="crm-section">
         <div class="label">starting on</div>
-        <div class="content"><input ng-min="{{now | date:'yyyy-MM-ddTHH:mm'}}" type=datetime-local ng-model="start" required/></div>
+        <div class="content">
+          <input crm-ui-datepicker="{}" ng-model="start"/>
+        </div>
         <div class="clear"></div>
       </div>
 
@@ -24,7 +26,7 @@
         <div class="label">every</div>
         <div class="content days-of-week">
           <span ng-repeat="dayOfWeek in daysOfWeek">
-  ng-change         <input type="checkbox" name="dayOfWeek_{{dayOfWeek.value}}" ng-model="dayOfWeek.selected" ng-change="validateDaysOfWeek();setWeekly()">{{dayOfWeek.value}}
+           <input type="checkbox" name="dayOfWeek_{{dayOfWeek.value}}" ng-model="dayOfWeek.selected" ng-change="validateDaysOfWeek();setWeekly()">{{dayOfWeek.value}}
         </span>
         <div ng-show="crmMailingRecur.$error.atLeastOneDay">Please choose a day</div>
         </div>
@@ -55,7 +57,8 @@
             <input type="radio" ng-model="end" value="never"> never
           </div>
           <div>
-            <input type="radio" ng-model="end" value="until"> on the <input type="date" ng-model="until" ng-focus="setEnd('until')" ng-required="end=='until'"/>
+            <input type="radio" ng-model="end" value="until"> on the
+            <input crm-ui-datepicker="{time: false}" ng-model="until"/>
           </div>
           <div>
             <input type="radio" ng-model="end" value="count"> after <input type="number" min="1" ng-model="count" ng-focus="setEnd('count')" ng-required="end=='count'"> occurences
@@ -67,7 +70,6 @@
           <input class="crm-form-submit default validate" crm-icon="fa-check" value="Schedule" type="submit" style="font-size: 1.2em; padding: 6px;">
         </div>
       </div>
-
   </div>
   </form>
 </div>

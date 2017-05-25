@@ -29,7 +29,7 @@
                   scope.recur = result.recur;
                 }
               }).catch(function(err){
-gi              });
+              });
               initialized = true;
             }
 
@@ -223,13 +223,7 @@ gi              });
               $scope.freq = _.find($scope.freqs, function(value){ return value.value == parts[1]; });
               break;
             case 'DTSTART':
-              $scope.start = new Date(
-                parts[1].substr(0,4) + '-' +
-                parts[1].substr(4,2) + '-' +
-                parts[1].substr(6,2) + 'T' +
-                parts[1].substr(9,2) + ':' +
-                parts[1].substr(11,2)
-              );
+              $scope.start = parts[1];
               break;
             case 'COUNT':
               $scope.end = 'count';
@@ -237,13 +231,13 @@ gi              });
               break;
             case 'UNTIL':
               $scope.end = 'until';
-              $scout.until = $scope.start = new Date(
+              $scope.until =
                 parts[1].substr(0,4) + '-' +
                 parts[1].substr(4,2) + '-' +
-                parts[1].substr(6,2) + 'T' +
+                parts[1].substr(6,2) + ' ' +
                 parts[1].substr(9,2) + ':' +
                 parts[1].substr(11,2)
-              );
+              ;
               break;
             case 'BYDAY':
             // At this point, we can be sure that $scope.freq is set correctly,
@@ -327,17 +321,23 @@ gi              });
         $scope.crmMailingRecur.$setValidity('atLeastOneDay', true);
       }
     };
+    $scope.validateStartDate = function(){
+      $scope.crmMailingRecur.$setValidity('startDatePresent', true);
+    };
+    $scope.validateUntilDate = function(){
+      $scope.crmMailingRecur.$setValidity('untilDatePresent', true);
+    };
 
     $scope.schedule = function() {
 
       // This validation is hacky, but I am not sure what a better / the correct
-      // approach is here.
+      // approach is here, esp. given the CiviCRM's datepicker angular directive
       $scope.validateDaysOfWeek();
+      $scope.validateStartDate();
+      $scope.validateUntilDate();
 
       if($scope.crmMailingRecur.$valid === true){
         $scope.recur = "DTSTART=" + $filter('date')($scope.start, 'yyyyMMddTHHmmss') + ';FREQ=' + $scope.freq.value + ';INTERVAL=' + $scope.interval + ';' + $scope.weekly + $scope.monthly + $scope.ends;
-        console.log($scope.recur);
-        console.log($scope.mailing.id);
         crmApi('MailingRecur', 'schedule', {
           mailing_id: $scope.mailing.id,
           recur: $scope.recur
