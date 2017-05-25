@@ -46,7 +46,7 @@ class CRM_Mailing_Recur_Upgrader_Base {
       // FIXME auto-generate
       self::$instance = new CRM_Mailing_Recur_Upgrader(
         'civicrm-recurring-mail',
-        realpath(__DIR__ . '/../../../')
+        realpath(__DIR__ . '/../../../../')
       );
     }
     return self::$instance;
