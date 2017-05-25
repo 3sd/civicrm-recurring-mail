@@ -29,8 +29,7 @@
                   scope.recur = result.recur;
                 }
               }).catch(function(err){
-                console.log(err);
-              });
+gi              });
               initialized = true;
             }
 
