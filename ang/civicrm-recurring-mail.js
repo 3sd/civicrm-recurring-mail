@@ -231,13 +231,7 @@
               break;
             case 'UNTIL':
               $scope.end = 'until';
-              $scope.until =
-                parts[1].substr(0,4) + '-' +
-                parts[1].substr(4,2) + '-' +
-                parts[1].substr(6,2) + ' ' +
-                parts[1].substr(9,2) + ':' +
-                parts[1].substr(11,2)
-              ;
+              $scope.until = parts[1].substr(0,4) + '-' + parts[1].substr(4,2) + '-' + parts[1].substr(6,2);
               break;
             case 'BYDAY':
             // At this point, we can be sure that $scope.freq is set correctly,

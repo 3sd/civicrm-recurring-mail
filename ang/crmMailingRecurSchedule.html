@@ -58,7 +58,7 @@
           </div>
           <div>
             <input type="radio" ng-model="end" value="until"> on the
-            <input crm-ui-datepicker="{time: false}" ng-model="until"/>
+            <input crm-ui-datepicker="{time: false, date: 'dd-mm-yy'}" ng-model="until"/>
           </div>
           <div>
             <input type="radio" ng-model="end" value="count"> after <input type="number" min="1" ng-model="count" ng-focus="setEnd('count')" ng-required="end=='count'"> occurences
