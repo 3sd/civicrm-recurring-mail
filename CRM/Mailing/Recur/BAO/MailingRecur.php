@@ -101,7 +101,7 @@ class CRM_Mailing_Recur_BAO_MailingRecur extends CRM_Mailing_Recur_DAO_MailingRe
       // Base the parameters for the recurrence on the master mailing
       $mailingParams = $masterMailing;
       unset($mailingParams['id']);
-      $mailingParams['name'] = '[RECURRING] '.$mailingParams['name'];
+      $mailingParams['name'] = $mailingParams['name'].' (recurring)';
       // Create and submit a new mailing with the appropriate date
       $createdMailing = civicrm_api3('mailing', 'create', $mailingParams);
       $submittedMailing = civicrm_api3('mailing', 'submit', [
