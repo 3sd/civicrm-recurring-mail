@@ -165,6 +165,3 @@ function civicrm_recurring_mail_civicrm_entityTypes(&$entityTypes) {
     'table' => 'civicrm_mailing_recurrence',
   );
 }
-
-function civicrm_recurring_mail_civicrm_searchColumns( $objectName, &$headers, &$values, &$selector ) {
-}
