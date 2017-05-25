@@ -261,6 +261,9 @@
         $scope.end = 'until';
       }
     });
+    $scope.$watch('start', function() {
+      $scope.validateStartDate();
+    });
 
     $scope.setWeekly = function() {
 
@@ -316,10 +319,22 @@
       }
     };
     $scope.validateStartDate = function(){
-      $scope.crmMailingRecur.$setValidity('startDatePresent', true);
+      if($scope.start.length > 0){
+        $scope.crmMailingRecur.$setValidity('startDateRequired', true);
+      } else {
+        $scope.crmMailingRecur.$setValidity('startDateRequired', false);
+      }
     };
     $scope.validateUntilDate = function(){
-      $scope.crmMailingRecur.$setValidity('untilDatePresent', true);
+      if($scope.end == 'until'){
+        if($scope.until.length > 0){
+          $scope.crmMailingRecur.$setValidity('untilDateRequired', true);
+        } else {
+          $scope.crmMailingRecur.$setValidity('untilDateRequired', false);
+        }
+      } else {
+        $scope.crmMailingRecur.$setValidity('untilDateRequired', true);
+      }
     };
 
     $scope.schedule = function() {
@@ -348,6 +363,7 @@
 
 
     $scope.$watchGroup(['end', 'until', 'count'], function() {
+      $scope.validateUntilDate();
       switch ($scope.end) {
         case 'until':
           if ($scope.until) {

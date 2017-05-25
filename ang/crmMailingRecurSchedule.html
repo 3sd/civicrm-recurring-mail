@@ -14,10 +14,11 @@
         <div class="clear"></div>
       </div>
 
-      <div class="crm-section">
+      <div class="crm-section start">
         <div class="label">starting on</div>
         <div class="content">
           <input crm-ui-datepicker="{}" ng-model="start"/>
+          <div ng-show="crmMailingRecur.$error.startDateRequired">Start date is required</div>
         </div>
         <div class="clear"></div>
       </div>
@@ -56,9 +57,10 @@
           <div>
             <input type="radio" ng-model="end" value="never"> never
           </div>
-          <div>
+          <div class="until">
             <input type="radio" ng-model="end" value="until"> on the
             <input crm-ui-datepicker="{time: false, date: 'dd-mm-yy'}" ng-model="until"/>
+            <div ng-show="crmMailingRecur.$error.untilDateRequired">Until date is required</div>
           </div>
           <div>
             <input type="radio" ng-model="end" value="count"> after <input type="number" min="1" ng-model="count" ng-focus="setEnd('count')" ng-required="end=='count'"> occurences
