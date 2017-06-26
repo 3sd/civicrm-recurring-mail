@@ -104,7 +104,7 @@ class CRM_Mailing_Recur_BAO_MailingRecur extends CRM_Mailing_Recur_DAO_MailingRe
   }
 
   function syncMailing($params, $mailingId = null){
-    $params = $this->masterMailing + $params;
+    $params = $params + $this->masterMailing;
     $params['name'] .= ' (recurring)';
     if($mailingId){
       $params['id'] = $mailingId;
