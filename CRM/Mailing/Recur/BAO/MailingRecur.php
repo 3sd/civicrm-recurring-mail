@@ -55,7 +55,9 @@ class CRM_Mailing_Recur_BAO_MailingRecur extends CRM_Mailing_Recur_DAO_MailingRe
     // generate new recurrences.
 
     // Get the master mailing and create params from it
-    $this->masterMailing = civicrm_api3('Mailing', 'getsingle', ['id' => $this->mailing_id]);
+    $mailingFields = array_fill_keys(array_column(civicrm_api3('Mailing', 'getfields')['values'], 'name'), '');
+    $masterMailing = civicrm_api3('Mailing', 'getsingle', ['id' => $this->mailing_id]);
+    $this->masterMailing = array_merge($mailingFields, $masterMailing);
 
     // Get the master mailing groups
     $this->masterMailingGroups = civicrm_api3('MailingGroup', 'get', ['mailing_id' => $this->mailing_id])['values'];
