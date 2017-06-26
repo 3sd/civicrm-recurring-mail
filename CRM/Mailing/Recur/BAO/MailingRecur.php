@@ -40,7 +40,6 @@ class CRM_Mailing_Recur_BAO_MailingRecur extends CRM_Mailing_Recur_DAO_MailingRe
   }
 
   function syncRecurrences(){
-
     // Strategy:
     // * Cycle through existing mailings
     // * Update each mailing based on:
@@ -62,6 +61,7 @@ class CRM_Mailing_Recur_BAO_MailingRecur extends CRM_Mailing_Recur_DAO_MailingRe
 
     // For some reason, we need to unset this parameter
     unset($this->masterMailing['sms_provider_id']);
+    unset($this->masterMailing['body_text']);
 
     // Get the master mailing groups
     $this->masterMailingGroups = civicrm_api3('MailingGroup', 'get', ['mailing_id' => $this->mailing_id])['values'];
@@ -91,7 +91,6 @@ class CRM_Mailing_Recur_BAO_MailingRecur extends CRM_Mailing_Recur_DAO_MailingRe
         // echo 'no more date params';
       }
     };
-
     // Any values still present in expected dates need to be created
     foreach($expectedDates as $date){
 
