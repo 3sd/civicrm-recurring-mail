@@ -66,7 +66,7 @@ class CRM_Mailing_Recur_BAO_MailingRecur extends CRM_Mailing_Recur_DAO_MailingRe
     // Get the master mailing groups
     $this->masterMailingGroups = civicrm_api3('MailingGroup', 'get', ['mailing_id' => $this->mailing_id])['values'];
 
-    // Get a list of existing recurrences
+    // Get a list of existing scheduled recurrences
     $scheduledRecurrences = CRM_Mailing_Recur_BAO_Recurrence::findScheduledRecurringMailings($this->mailing_id);
 
     // var_dump($scheduledRecurrences);
@@ -167,12 +167,13 @@ class CRM_Mailing_Recur_BAO_MailingRecur extends CRM_Mailing_Recur_DAO_MailingRe
     return $recurrences;
   }
 
+  /**
+   * Delete recurrences that have not yet been sent
+   */
   function deleteRecurrenceMailings(){
-    $recurrences = new CRM_Mailing_Recur_BAO_Recurrence;
-    $recurrences->mailing_recur_id = $this->id;
-    $recurrences->find();
-    while($recurrences->fetch()){
-      civicrm_api3('Mailing', 'delete', ['id' => $recurrences->mailing_id]);
+    $scheduledRecurrences = CRM_Mailing_Recur_BAO_Recurrence::findScheduledRecurringMailings($this->mailing_id);
+    while($scheduledRecurrences->fetch()){
+      civicrm_api3('Mailing', 'delete', ['id' => $scheduledRecurrences->id]);
     }
   }
 
