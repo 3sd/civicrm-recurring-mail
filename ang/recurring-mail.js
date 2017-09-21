@@ -5,8 +5,22 @@
   recurringMail.directive('crmMailingBlockScheduleRecurOption', function() {
     return {
       templateUrl: CRM.resourceUrls['civicrm-recurring-mail'] + '/ang/blockScheduleRecurOption.html',
-      scope: {
-        mailing: '='
+      controller: function($scope, crmApi){
+        var initialized = false;
+        $scope.$watch('schedule', function() {
+          if(!initialized){
+            crmApi('MailingRecur', 'getsingle', {
+              mailing_id: $scope.mailing.id,
+            }).then(function(result) {
+              if(!result.is_error){
+                $scope.schedule.mode = 'recur';
+                $scope.recur = result.recur;
+              }
+            }).catch(function(err){
+            });
+            initialized = true;
+          }
+        }, true);
       }
     };
   });
@@ -18,28 +32,6 @@
   });
 
   recurringMail.controller('RecurrenceWidgetController', function($scope, $filter, crmApi){
-
-    var initialized = false;
-    $scope.$parent.$parent.$watch('schedule', function() {
-      if(!initialized){
-        crmApi('MailingRecur', 'getsingle', {
-          mailing_id: $scope.$parent.$parent.$parent.mailing.id,
-        }).then(function(result) {
-          if(!result.is_error){
-            $scope.$parent.$parent.schedule.mode = 'recur';
-            $scope.recur = result.recur;
-          }
-        }).catch(function(err){
-        });
-        initialized = true;
-      }
-
-      if ($scope.$parent.$parent.$parent.schedule.mode == 'recur') {
-        $('.crmMailing-submit-button').hide();
-        return;
-      }
-      $('.crmMailing-submit-button').show();
-    }, true);
 
     // Repeat on a [freq.label] basis
     $scope.freqs = [{
@@ -320,7 +312,7 @@
         $scope.recur = "DTSTART=" + $filter('date')($scope.start, 'yyyyMMddTHHmmss') + ';FREQ=' + $scope.freq.value + ';INTERVAL=' + $scope.interval + ';' + $scope.weekly + $scope.monthly + $scope.ends;
         console.log($scope.recur);
         crmApi('MailingRecur', 'schedule', {
-          mailing_id: $scope.$parent.$parent.$parent.mailing.id ,
+          mailing_id: $scope.$parent.$parent.mailing.id ,
           recur: $scope.recur
 
         }).then(function(result) {
@@ -329,7 +321,7 @@
           console.log(err);
         });
       }else{
-        throw('Invalid recurrence rule.');
+        CRM.alert('The form is invalid - please ensure you have completed all necessary fields.');
       }
     };
 
