@@ -16,8 +16,17 @@
                 $scope.schedule.mode = 'recur';
                 $scope.recur = result.recur;
               }
+
+              if ($scope.schedule.mode == 'recur') {
+                CRM.$('.crmMailing-submit-button').hide();
+              }else{
+                CRM.$('.crmMailing-submit-button').show();
+              }
+
             }).catch(function(err){
             });
+
+
             initialized = true;
           }
         }, true);
