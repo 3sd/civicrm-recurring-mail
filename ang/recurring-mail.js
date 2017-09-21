@@ -18,9 +18,9 @@
               }
 
               if ($scope.schedule.mode == 'recur') {
-                CRM.$('.crmMailing-submit-button').hide();
+                $('.crmMailing-submit-button').hide();
               }else{
-                CRM.$('.crmMailing-submit-button').show();
+                $('.crmMailing-submit-button').show();
               }
 
             }).catch(function(err){
