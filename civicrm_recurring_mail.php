@@ -165,3 +165,12 @@ function civicrm_recurring_mail_civicrm_entityTypes(&$entityTypes) {
     'table' => 'civicrm_mailing_recurrence',
   );
 }
+
+function civicrm_recurring_mail_civicrm_alterAngular($angular){
+  $changeSet = \Civi\Angular\ChangeSet::create('recurring_mail')
+    ->alterHtml('~/crmMailing/BlockSchedule.html',
+      function (phpQueryObject $doc) {
+        $doc->find('.crmMailing-schedule-inner')->append('<crm-mailing-block-schedule-recur-option></crm-mailing-block-schedule-recur-option>');
+    });
+  $angular->add($changeSet);
+}

@@ -1,4 +1,4 @@
-<div class="crmMailingRecur">
+<div class="crmMailingRecur" ng-controller="RecurrenceWidgetController">
   <div class="crm-block crm-form-block">
     <form name='crmMailingRecur' ng-submit="schedule()">
       <div class="crm-section">
@@ -14,11 +14,12 @@
         <div class="clear"></div>
       </div>
 
-      <div class="crm-section">
+      <div class="crm-section" ng-class="{'crmMailingRecur-invalid':crmMailingRecur.$error.startDatePresent}">
         <div class="label">starting on</div>
         <div class="content">
           <input crm-ui-datepicker="{}" ng-model="start"/>
         </div>
+        <div ng-show="crmMailingRecur.$error.startDatePresent">Please enter a start date</div>
         <div class="clear"></div>
       </div>
 
