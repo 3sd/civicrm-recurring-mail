@@ -23,7 +23,7 @@
     $scope.$parent.$parent.$watch('schedule', function() {
       if(!initialized){
         crmApi('MailingRecur', 'getsingle', {
-          mailing_id: $scope.$parent.$parent.mailing.id,
+          mailing_id: $scope.$parent.$parent.$parent.mailing.id,
         }).then(function(result) {
           if(!result.is_error){
             $scope.$parent.$parent.schedule.mode = 'recur';
@@ -34,7 +34,7 @@
         initialized = true;
       }
 
-      if ($scope.$parent.$parent.schedule.mode == 'recur') {
+      if ($scope.$parent.$parent.$parent.schedule.mode == 'recur') {
         $('.crmMailing-submit-button').hide();
         return;
       }
@@ -232,6 +232,10 @@
       }
     });
 
+    $scope.$watch('start', function() {
+      $scope.validateStartDate();
+    });
+
     $scope.setWeekly = function() {
 
       if ($scope.freq.value == 'WEEKLY') {
@@ -286,14 +290,22 @@
       }
     };
     $scope.validateStartDate = function(){
-      if($scope.start){
-        $scope.crmMailingRecur.$setValidity('startDatePresent', true);
-      }else{
-        $scope.crmMailingRecur.$setValidity('startDatePresent', false);
+      if('start' in $scope && $scope.start.length > 0){
+        $scope.crmMailingRecur.$setValidity('startDateRequired', true);
+      } else {
+        $scope.crmMailingRecur.$setValidity('startDateRequired', false);
       }
     };
     $scope.validateUntilDate = function(){
-      $scope.crmMailingRecur.$setValidity('untilDatePresent', true);
+      if($scope.end == 'until'){
+        if($scope.until.length > 0){
+          $scope.crmMailingRecur.$setValidity('untilDateRequired', true);
+        } else {
+          $scope.crmMailingRecur.$setValidity('untilDateRequired', false);
+        }
+      } else {
+        $scope.crmMailingRecur.$setValidity('untilDateRequired', true);
+      }
     };
 
     $scope.schedule = function() {
@@ -308,7 +320,7 @@
         $scope.recur = "DTSTART=" + $filter('date')($scope.start, 'yyyyMMddTHHmmss') + ';FREQ=' + $scope.freq.value + ';INTERVAL=' + $scope.interval + ';' + $scope.weekly + $scope.monthly + $scope.ends;
         console.log($scope.recur);
         crmApi('MailingRecur', 'schedule', {
-          mailing_id: $scope.$parent.$parent.mailing.id,
+          mailing_id: $scope.$parent.$parent.$parent.mailing.id ,
           recur: $scope.recur
 
         }).then(function(result) {
@@ -322,6 +334,7 @@
     };
 
     $scope.$watchGroup(['end', 'until', 'count'], function() {
+      $scope.validateUntilDate();
       switch ($scope.end) {
         case 'until':
           if ($scope.until) {

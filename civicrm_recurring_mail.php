@@ -123,7 +123,7 @@ function civicrm_recurring_mail_civicrm_alterSettingsFolders(&$metaDataFolders =
 }
 
 function civicrm_recurring_mail_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values){
-  if($objectName == 'Mailing' && in_array($op, array('view.mailing.browse.scheduled', 'view.mailing.browse.unscheduled'))){
+  if($objectName == 'Mailing' && in_array($op, array('view.mailing.browse.scheduled', 'view.mailing.browse.unscheduled', 'view.mailing.browse'))){
     $recurrence = new CRM_Mailing_Recur_BAO_Recurrence;
     if($recurrence->get('mailing_id', $objectId)){
       foreach($links as $key => $link){

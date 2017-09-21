@@ -6,10 +6,9 @@
   width: 3em;
 }
 
-.crmMailing .crmMailingRecur .ng-invalid-at-least-one-day.ng-dirty .days-of-week{
-}
-
-.crmMailingRecur-invalid{
+.crmMailingRecur .ng-invalid-at-least-one-day.ng-dirty .days-of-week,
+.crmMailingRecur .ng-invalid-start-date-required.ng-dirty .start,
+.crmMailingRecur .ng-invalid-until-date-required.ng-dirty .until{
   border: 1px solid red;
   color: red;
 }
