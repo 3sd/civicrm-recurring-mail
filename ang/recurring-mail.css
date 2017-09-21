@@ -1,8 +1,8 @@
-.crmMailingRecur select{
+.crmMailing .crmMailingRecur select{
   width: auto;
 }
 
-.crmMailingRecur input[type=number] {
+.crmMailing .crmMailingRecur input[type=number] {
   width: 3em;
 }
 

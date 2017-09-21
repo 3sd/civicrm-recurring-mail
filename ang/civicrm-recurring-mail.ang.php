@@ -1,5 +1,5 @@
 <?php
 return array(
-  'js'=>'ang/civicrm-recurring-mail.js',
-  'css'=>'ang/civicrm-recurring-mail.css'
+  'js'=>'ang/recurring-mail.js',
+  'css'=>'ang/recurring-mail.css'
 );

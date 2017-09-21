@@ -123,7 +123,7 @@ function civicrm_recurring_mail_civicrm_alterSettingsFolders(&$metaDataFolders =
 }
 
 function civicrm_recurring_mail_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values){
-  if($objectName == 'Mailing' && in_array($op, array('view.mailing.browse', 'view.mailing.browse.scheduled', 'view.mailing.browse.unscheduled'))){
+  if($objectName == 'Mailing' && in_array($op, array('view.mailing.browse.scheduled', 'view.mailing.browse.unscheduled', 'view.mailing.browse'))){
     $recurrence = new CRM_Mailing_Recur_BAO_Recurrence;
     if($recurrence->get('mailing_id', $objectId)){
       foreach($links as $key => $link){
@@ -164,4 +164,13 @@ function civicrm_recurring_mail_civicrm_entityTypes(&$entityTypes) {
     'class' => 'CRM_Mailing_Recur_DAO_Recurrence',
     'table' => 'civicrm_mailing_recurrence',
   );
+}
+
+function civicrm_recurring_mail_civicrm_alterAngular($angular){
+  $changeSet = \Civi\Angular\ChangeSet::create('recurring_mail')
+    ->alterHtml('~/crmMailing/BlockSchedule.html',
+      function (phpQueryObject $doc) {
+        $doc->find('.crmMailing-schedule-inner')->append('<crm-mailing-block-schedule-recur-option></crm-mailing-block-schedule-recur-option>');
+    });
+  $angular->add($changeSet);
 }

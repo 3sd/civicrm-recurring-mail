@@ -1,14 +1,8 @@
 <?php
 
-class CRM_Mailing_Recur_Page_Scratch extends CRM_Core_Page
+class CRM_Mailing_Recur_Scratch
 {
-  public function run()
-  {
-    $this->deleteAllMailings();
-    // $this->outputRecurInstances();
-  }
-
-  public function deleteAllMailings(){
+  static public function deleteAllMailings(){
     foreach(civicrm_api3('mailing', 'get', ['option.limit' => 10000])['values'] as $m){
       civicrm_api3('mailing', 'delete', ['id' => $m['id']]);
     }
