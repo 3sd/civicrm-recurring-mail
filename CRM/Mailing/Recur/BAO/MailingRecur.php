@@ -40,80 +40,110 @@ class CRM_Mailing_Recur_BAO_MailingRecur extends CRM_Mailing_Recur_DAO_MailingRe
   }
 
   function syncRecurrences(){
-    // Get the master mailing.
-    $masterMailing = civicrm_api3('mailing', 'getsingle', ['id' => $this->mailing_id]);
+    // Strategy:
+    // * Cycle through existing mailings
+    // * Update each mailing based on:
+    //    * the master mailing
+    //    * the master mailing groups
+    //    * an expected date
+    // If we run out of dates, remove any remaining existing mailings
+    // If dates remain, create new mailings
 
-    // Get the list of dates that we would expect to exist, based on the rule.
+    // TODO If there are no expected dates, mark this recurring mail as
+    // completed, which means it will be ignored when running the cron to
+    // generate new recurrences.
+
+    // Get the master mailing and create params from it
+    $mailingFields = array_fill_keys(array_column(civicrm_api3('Mailing', 'getfields')['values'], 'name'), '');
+    $masterMailing = civicrm_api3('Mailing', 'getsingle', ['id' => $this->mailing_id]);
+
+    $this->masterMailing = array_merge($mailingFields, $masterMailing);
+
+    // For some reason, we need to unset this parameter
+    unset($this->masterMailing['sms_provider_id']);
+    unset($this->masterMailing['body_text']);
+
+    // Get the master mailing groups
+    $this->masterMailingGroups = civicrm_api3('MailingGroup', 'get', ['mailing_id' => $this->mailing_id])['values'];
+
+    // Get a list of existing scheduled recurrences
+    $scheduledRecurrences = CRM_Mailing_Recur_BAO_Recurrence::findScheduledRecurringMailings($this->mailing_id);
+
+    // var_dump($scheduledRecurrences);
+    // Get an array of dates that we would expect to exist, based on the rule.
     $expectedDates = $this->getExpectedDates();
 
-    //TODO If there are no expected dates, mark this recurring mail as completed
-    // (which means it will be ignored when running the cron to generate new
-    // recurrences
-    // if(!count($expectedDates)){
-    // }
+    // Cycle through existing mailings
+    while($scheduledRecurrences->fetch()){
 
-    // To start, assume that none are in existence...
-    $existingDates = [];
+      // Take the next date parameter (if one exists)
+      if($date = array_shift($expectedDates)){
 
-    // ... and that we need to create them all.
-    $datesToCreate = $expectedDates;
+        // Set the scheduled date param
+        $params = ['scheduled_date' => $date->format('Y-m-d H:i:s')];
+        // Sync the mailing to the master
+        $this->syncMailing($params, $scheduledRecurrences->id);
 
-    // Cycle through the list of existing recurrences.
-    $existingRecurrences = new CRM_Mailing_Recur_BAO_Recurrence;
-    $existingRecurrences->mailing_recur_id = $this->id;
-    $existingRecurrences->find();
-    while($existingRecurrences->fetch()){
-
-      // Retreive the mailing linked to this recurrence.
-      $mailing = $existingRecurrences->getMailing();
-
-      // Check if the scheduled date of this mailing is in our range of expected
-      // dates.
-
-      $expectedKey = array_search(new DateTime($mailing['scheduled_date']), $expectedDates);
-
-      if($expectedKey !== false){
-        // If it is, we don't need to create it.
-        unset($datesToCreate[$expectedKey]);
+        // Sync the mailing groups the master
+        $this->syncMailingGroups($scheduledRecurrences->id);
       }else{
-        // If it isn't we should delete it.
-        civicrm_api3('mailing', 'delete', ['id' => $existingRecurrences->mailing_id]);
+        civicrm_api3('Mailing', 'delete', ['id' => $scheduledRecurrences->id]);
+        // echo 'no more date params';
       }
+    };
+    // Any values still present in expected dates need to be created
+    foreach($expectedDates as $date){
 
-      // Now check to see if we already have a recurrence set at this time.
-      $existingKey = array_search(new DateTime($mailing['scheduled_date']), $existingDates);
+      // Set the scheduled date param
+      $params = ['scheduled_date' => $date->format('Y-m-d H:i:s')];
 
-      if($existingKey !== false){
-        // If we do, then consider this recurrence as a duplicate and delete it.
-        civicrm_api3('mailing', 'delete', ['id' => $existingRecurrences->mailing_id]);
-      }else{
-        // If we don't then add this time to the list of existing dates to check
-        // against next time around.
-        $existingDates[] = new DateTime($mailing['scheduled_date']);
-      }
+      // Sync the mailing to the master
+      $mailingId = $this->syncMailing($params);
+
+      // Sync the mailing groups the master
+      $this->syncMailingGroups($mailingId);
     }
+    return;
+  }
 
-    // We have now deleted all duplicate and out of range recurrences.
+  function syncMailing($params, $mailingId = null){
+    $params = $params + $this->masterMailing;
+    $params['name'] .= ' (recurring)';
 
-    // We need to create all missing recurrences.
-    foreach($datesToCreate as $date){
 
-      // Base the parameters for the recurrence on the master mailing
-      $mailingParams = $masterMailing;
-      unset($mailingParams['id']);
-      $mailingParams['name'] = $mailingParams['name'].' (recurring)';
-      // Create and submit a new mailing with the appropriate date
-      $createdMailing = civicrm_api3('mailing', 'create', $mailingParams);
-      $submittedMailing = civicrm_api3('mailing', 'submit', [
-        'id' => $createdMailing['id'],
-        'scheduled_date' => $date->format('YmdHis')
-      ]);
-
-      // Create a recurrence for this mailing
+    if($mailingId){
+      $params['id'] = $mailingId;
+    }else{
+      unset($params['id']);
+    }
+    $result = civicrm_api3('Mailing', 'create', $params);
+    if(!$mailingId){
       CRM_Mailing_Recur_BAO_Recurrence::create([
-        'mailing_id' => $createdMailing['id'],
+        'mailing_id' => $result['id'],
         'mailing_recur_id' => $this->id
       ]);
+    }
+    return $result['id'];
+  }
+
+  // TODO This function is fairly expensive. It would not be too hard to
+  // refactor and have most of the comparisons happening in php rather than via
+  // queries
+  function syncMailingGroups($mailingId){
+    $existingMailingGroups = civicrm_api3('MailingGroup', 'get', ['mailing_id' => $mailingId])['values'];
+
+    foreach($this->masterMailingGroups as $params){
+      unset($params['id']);
+      $params['mailing_id'] = $mailingId;
+      $result = civicrm_api3('MailingGroup', 'get', $params);
+      if($result['count']){
+        unset($existingMailingGroups[$result['id']]);
+      }else{
+        $result = civicrm_api3('MailingGroup', 'create', $params);
+      }
+    }
+    foreach($existingMailingGroups as $group){
+      civicrm_api3('MailingGroup', 'delete', ['id' => $group['id']]);
     }
   }
 
@@ -137,12 +167,13 @@ class CRM_Mailing_Recur_BAO_MailingRecur extends CRM_Mailing_Recur_DAO_MailingRe
     return $recurrences;
   }
 
+  /**
+   * Delete recurrences that have not yet been sent
+   */
   function deleteRecurrenceMailings(){
-    $recurrences = new CRM_Mailing_Recur_BAO_Recurrence;
-    $recurrences->mailing_recur_id = $this->id;
-    $recurrences->find();
-    while($recurrences->fetch()){
-      civicrm_api3('Mailing', 'delete', ['id' => $recurrences->mailing_id]);
+    $scheduledRecurrences = CRM_Mailing_Recur_BAO_Recurrence::findScheduledRecurringMailings($this->mailing_id);
+    while($scheduledRecurrences->fetch()){
+      civicrm_api3('Mailing', 'delete', ['id' => $scheduledRecurrences->id]);
     }
   }
 
