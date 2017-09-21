@@ -29,7 +29,7 @@
           }else{
             $('.crmMailing-submit-button').show();
           }
-          
+
         }, true);
       }
     };
@@ -328,7 +328,7 @@
         }).then(function(result) {
           window.location = CRM.url('civicrm/mailing/browse/scheduled', { reset: 1, scheduled: 'true' });
         }).catch(function(err){
-          console.log(err);
+          CRM.alert(err.error_message);
         });
       }else{
         CRM.alert('The form is invalid - please ensure you have completed all necessary fields.');
