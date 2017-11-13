@@ -12,13 +12,12 @@ function _civicrm_api3_mailing_recur_Schedule_spec(&$spec) {
 }
 
 /**
- * MailingRecur.Schedule API
+ * MailingRecur.Unschedule API
  *
- * @param array $params
- * @return array API result descriptor
- * @see civicrm_api3_create_success
- * @see civicrm_api3_create_error
- * @throws API_Exception
+ * Deletes all recurrences and deletes the mailing recur. Leaves the mailing
+ * itself. In other words, converts a recurring mailing to a normal mailing.
+ * This function is called when deleting a mailing, and also when submitting
+ * a mailing, since submission (which I am fairly sure if the right thing to).
  */
 function civicrm_api3_mailing_recur_Unschedule($params) {
   // Check that mailing_id exists and throw an error if not

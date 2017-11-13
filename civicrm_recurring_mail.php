@@ -143,10 +143,16 @@ function civicrm_recurring_mail_civicrm_links($op, $objectName, $objectId, &$lin
   }
 }
 
+function civicrm_recurring_mail_civicrm_apiWrappers(&$wrappers, $apiRequest){
+  if ($apiRequest['entity'] == 'Mailing' && $apiRequest['action'] == 'submit') {
+    $wrappers[] = new CRM_Mailing_Recur_Wrapper_MailingSubmit();
+  }
+}
+
 function civicrm_recurring_mail_civicrm_pre($op, $objectName, $id, &$params){
   // When deleting a mailing, check to see if it is a recurring mailing
   if($objectName == 'Mailing' && $op == 'delete'){
-    if((new CRM_Mailing_Recur_BAO_MailingRecur)->isRecurringMailing($id)){
+    if(CRM_Mailing_Recur_BAO_MailingRecur::isRecurringMailing($id)){
       //If so, unschedule it before deleting (this will delete the recurrences)
       civicrm_api3('MailingRecur', 'unschedule', ['mailing_id' => $id]);
     }

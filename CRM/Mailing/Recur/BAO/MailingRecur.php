@@ -177,7 +177,8 @@ class CRM_Mailing_Recur_BAO_MailingRecur extends CRM_Mailing_Recur_DAO_MailingRe
     }
   }
 
-  function isRecurringMailing($mailing_id){
-    return (boolean) $this->get('mailing_id', $mailing_id);
+  public static function isRecurringMailing($mailing_id){
+    $instance = new self;
+    return (boolean) $instance->get('mailing_id', $mailing_id);
   }
 }
