@@ -98,6 +98,7 @@ class CRM_Mailing_Recur_BAO_MailingRecur extends CRM_Mailing_Recur_DAO_MailingRe
       $params = ['scheduled_date' => $date->format('Y-m-d H:i:s')];
 
       // Sync the mailing to the master
+      // TODO Explore using the Mailing.clone action 
       $mailingId = $this->syncMailing($params);
 
       // Sync the mailing groups the master
