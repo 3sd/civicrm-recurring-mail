@@ -26,6 +26,10 @@ You can edit the master mailing and adjust the recurrence schedule as necessary.
 
 **Note:** out-of-the-box, CiviCRM calculates the recipients for a mailing based on the contacts that are in your include/exclude groups/mailings at the time that you hit the submit button. This means that any contacts that are added or removed to your groups in the time between when you hit the submit button and the date it is scheduled to go out will not receive your mailing.  If you want your recipients to be recalculated before the mailing is sent you, you should install the [recalculate recipients extension](https://github.com/3sd/civicrm-recalculate-recipients).
 
+## Help
+
+If you have any questions regarding this extension that are not answered in this README, please check post a question on http://civicrm.stackexchange.com or contact info@thirdsectordesign.org.
+
 ## Credits
 
 This extension has been generously funded by [eLife Sciences](https://elifesciences.org/), a unique, non-profit collaboration between the funders and practitioners of research to improve the way important results are presented and shared.
