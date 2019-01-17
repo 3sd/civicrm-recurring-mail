@@ -18,7 +18,7 @@
   <version>1.0.0-beta</version>
   <develStage>beta</develStage>
   <compatibility>
-    <ver>6.3</ver>
+    <ver>5.3</ver>
   </compatibility>
   <civix>
     <namespace>CRM/Mailing/Recur</namespace>
