@@ -109,7 +109,7 @@ class CRM_Mailing_Recur_DAO_Recurrence extends CRM_Core_DAO {
           'title' => ts('Recurring rule ID') ,
           'description' => 'The ID of the recur rule.',
           'required' => true,
-          'FKClassName' => 'CRM_Mailing_DAO_MailingRecur',
+          'FKClassName' => 'CRM_Mailing_Recur_DAO_MailingRecur',
         ) ,
         'mailing_id' => array(
           'name' => 'mailing_id',
